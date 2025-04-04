@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: diary-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: diary-app
+  template:
+    metadata:
+      labels:
+        app: diary-app
+    spec:
+      containers:
+      - name: client
+        image: [카카오 클라우드 레지스트리 주소]/diary-app_client:latest
+        ports:
+        - containerPort: 80
+      - name: server
+        image: [카카오 클라우드 레지스트리 주소]/diary-app_server:latest
+        ports:
+        - containerPort: 5000
+        env:
+        - name: DB_HOST
+          value: mysql
+        - name: DB_USER
+          value: root
+        - name: DB_PASSWORD
+          value: "1234"
+        - name: DB_NAME
+          value: diary_app
+        - name: JWT_SECRET
+          value:    
+      - name: mysql
+        image: mysql:8.0
+        ports:
+        - containerPort: 3306
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: "1234"
+        - name: MYSQL_DATABASE
+          value: diary_app
+        volumeMounts:
+        - name: mysql-data
+          mountPath: /var/lib/mysql
+      volumes:
+      - name: mysql-data
+        persistentVolumeClaim:
+          claimName: mysql-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: diary-app
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: 80
+  selector:
+    app: diary-app
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi 
