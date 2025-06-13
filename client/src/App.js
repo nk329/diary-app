@@ -8,6 +8,8 @@ import DiaryForm from './components/DiaryForm';
 import { Container, Typography, Box, CssBaseline, ThemeProvider, createTheme } from '@mui/material';
 import axios from 'axios';
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 const theme = createTheme({
   palette: {
     primary: {
@@ -29,7 +31,7 @@ function App() {
 
   const fetchDiaries = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/diaries');
+      const response = await axios.get(`${API_URL}/api/diaries`);
       setDiaries(response.data);
     } catch (error) {
       console.error('Error fetching diaries:', error);
@@ -38,7 +40,7 @@ function App() {
 
   const handleAddDiary = async (diary) => {
     try {
-      const response = await axios.post('http://localhost:5000/api/diaries', diary);
+      const response = await axios.post(`${API_URL}/api/diaries`, diary);
       setDiaries([response.data, ...diaries]);
     } catch (error) {
       console.error('Error adding diary:', error);
@@ -47,7 +49,7 @@ function App() {
 
   const handleUpdateDiary = async (id, updatedDiary) => {
     try {
-      const response = await axios.put(`http://localhost:5000/api/diaries/${id}`, updatedDiary);
+      const response = await axios.put(`${API_URL}/api/diaries/${id}`, updatedDiary);
       setDiaries(diaries.map(diary => 
         diary._id === id ? response.data : diary
       ));
@@ -59,7 +61,7 @@ function App() {
 
   const handleDeleteDiary = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/diaries/${id}`);
+      await axios.delete(`${API_URL}/api/diaries/${id}`);
       setDiaries(diaries.filter(diary => diary._id !== id));
     } catch (error) {
       console.error('Error deleting diary:', error);

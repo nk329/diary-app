@@ -11,6 +11,14 @@ import {
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
 
+// axios 인스턴스 생성
+const api = axios.create({
+  baseURL: 'http://localhost:5000',
+  headers: {
+    'Content-Type': 'application/json'
+  }
+});
+
 function Login() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -30,16 +38,19 @@ function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    console.log('로그인 시도:', formData);
 
     try {
-      const response = await axios.post('http://localhost:5001/api/auth/login', {
+      const response = await api.post('/api/auth/login', {
         email: formData.email,
         password: formData.password,
       });
+      console.log('로그인 응답:', response.data);
 
       localStorage.setItem('token', response.data.token);
       navigate('/diary');
     } catch (error) {
+      console.error('로그인 에러:', error);
       setError(error.response?.data?.message || '로그인 중 오류가 발생했습니다.');
     }
   };
